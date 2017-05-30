@@ -15,28 +15,44 @@
 TEMPLATE = lib
 
 include(../global.pri)
+include(./include/PyTrikControl/PyTrikControl.pri)
 
 PUBLIC_HEADERS += \
 	$$PWD/include/trikScriptRunner/trikScriptRunner.h \
+        $$PWD/include/trikScriptRunner/trikScriptRunnerInterface.h \
+        $$PWD/include/trikScriptRunner/trikPythonRunner.h \
 
 HEADERS += \
 	$$PWD/src/scriptable.h \
 	$$PWD/src/scriptExecutionControl.h \
 	$$PWD/src/scriptEngineWorker.h \
 	$$PWD/src/threading.h \
-	$$PWD/src/utils.h \
-	$$PWD/src/scriptThread.h \
+        $$PWD/src/utils.h \
+        $$PWD/src/scriptThread.h \
 
 SOURCES += \
 	$$PWD/src/scriptExecutionControl.cpp \
 	$$PWD/src/scriptEngineWorker.cpp \
 	$$PWD/src/trikScriptRunner.cpp \
+        $$PWD/src/trikPythonRunner.cpp \
 	$$PWD/src/threading.cpp \
 	$$PWD/src/utils.cpp \
 	$$PWD/src/scriptThread.cpp \
 
 OTHER_FILES += \
 	$$PWD/system.js \
+
+# Python
+INCLUDEPATH += \
+        /home/columpio/CLionProjects/pp2/src \
+        /usr/include/python2.7/ \
+        ./include/PyTrikControl \
+        ../trikControl/src \
+        ../trikControl/include/trikControl \
+
+LIBS += \
+        -L/home/columpio/CLionProjects/pp2/lib -lPythonQt \
+        -lpython2.7 -lpthread -ldl -lutil -lm \
 
 
 TRANSLATIONS = \

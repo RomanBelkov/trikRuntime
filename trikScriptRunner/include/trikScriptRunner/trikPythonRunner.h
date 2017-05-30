@@ -15,6 +15,7 @@
 #pragma once
 
 #include "trikScriptRunnerInterface.h"
+#include "PythonQt.h"
 
 namespace trikNetwork {
 class MailboxInterface;
@@ -26,22 +27,18 @@ class BrickInterface;
 
 namespace trikScriptRunner {
 
-class ScriptEngineWorker;
-class ScriptExecutionControl;
-
-/// Executes scripts in Qt Scripting Engine.
-class TrikScriptRunner : public TrikScriptRunnerInterface
+class TrikPythonRunner : public TrikScriptRunnerInterface
 {
 	Q_OBJECT
 public:
 	/// Constructor.
 	/// @param brick - reference to trikControl::Brick instance.
 	/// @param mailbox - mailbox object used to communicate with other robots.
-	TrikScriptRunner(trikControl::BrickInterface &brick
+	TrikPythonRunner(trikControl::BrickInterface &brick
 					 , trikNetwork::MailboxInterface * const mailbox
 					 );
 
-	~TrikScriptRunner();
+	~TrikPythonRunner();
 
 	void registerUserFunction(const QString &name, QScriptEngine::FunctionSignature function) override;
 	void addCustomEngineInitStep(const std::function<void (QScriptEngine *)> &step) override;
@@ -79,15 +76,7 @@ private slots:
 	void sendMessageFromMailBox(int senderNumber, const QString &message);
 
 private:
-	QScopedPointer<ScriptExecutionControl> mScriptController;
-
-	/// Has ownership, memory is managed by thread and deleteLater().
-	ScriptEngineWorker *mScriptEngineWorker;
-	QThread mWorkerThread;
-
-	int mMaxScriptId;
-
-	QHash<int, QString> mScriptFileNames;
+	PythonQtObjectPtr mainContext;
 };
 
 }
