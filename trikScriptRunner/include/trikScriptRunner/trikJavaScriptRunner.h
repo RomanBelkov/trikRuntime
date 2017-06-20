@@ -15,7 +15,6 @@
 #pragma once
 
 #include "trikScriptRunnerInterface.h"
-#include <QFileInfo>
 
 namespace trikNetwork {
 class MailboxInterface;
@@ -27,42 +26,48 @@ class BrickInterface;
 
 namespace trikScriptRunner {
 
-enum ScriptType { // must be 0, 1, ..
-	JAVASCRIPT,
-	PYTHON,
+class ScriptEngineWorker;
+class ScriptExecutionControl;
 
-	ScriptTypeLength // should always be the last
-};
-
-/// General wrapper for other executors (such as Python, JavaScript)
-class TrikScriptRunner : public TrikScriptRunnerInterface
+/// Executes scripts in Qt Scripting Engine.
+class TrikJavaScriptRunner : public TrikScriptRunnerInterface
 {
 	Q_OBJECT
 public:
 	/// Constructor.
 	/// @param brick - reference to trikControl::Brick instance.
 	/// @param mailbox - mailbox object used to communicate with other robots.
-	TrikScriptRunner(trikControl::BrickInterface &brick
-					 , trikNetwork::MailboxInterface * const mailbox
-					 );
+	TrikJavaScriptRunner(trikControl::BrickInterface &brick
+						 , trikNetwork::MailboxInterface * const mailbox
+						 );
 
-	~TrikScriptRunner();
+	~TrikJavaScriptRunner();
 
 	void registerUserFunction(const QString &name, QScriptEngine::FunctionSignature function) override;
 	void addCustomEngineInitStep(const std::function<void (QScriptEngine *)> &step) override;
 
 public slots:
 	void run(const QString &script, const QString &fileName = "") override;
-	void run(const QString &script, const ScriptType &stype, const QString &fileName = "");
 	void runDirectCommand(const QString &command) override;
 	void abort() override;
 	void brickBeep() override;
 
+private slots:
+	void onScriptStart(int scriptId);
+
+	/// Sends message to host machine from mailbox via wifi.
+	void sendMessageFromMailBox(int senderNumber, const QString &message);
+
 private:
-	trikControl::BrickInterface &brick;
-	trikNetwork::MailboxInterface * mailbox;
-	TrikScriptRunnerInterface * mScriptRunnerArray[ScriptTypeLength] = {nullptr};
-	ScriptType mLastRunner;
+	QScopedPointer<ScriptExecutionControl> mScriptController;
+
+	/// Has ownership, memory is managed by thread and deleteLater().
+	ScriptEngineWorker *mScriptEngineWorker;
+	QThread mWorkerThread;
+
+	int mMaxScriptId;
+
+	QHash<int, QString> mScriptFileNames;
 };
 
 }
