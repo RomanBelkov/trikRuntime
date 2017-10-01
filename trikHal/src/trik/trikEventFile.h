@@ -15,11 +15,11 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QEventLoop>
+#include <QSocketNotifier>
 
 #include "eventFileInterface.h"
 
-class QEventLoop;
-class QSocketNotifier;
 
 namespace trikHal {
 namespace trik {
@@ -34,8 +34,7 @@ public:
 	/// @param fileName - file name (with path, relative or absolute) of an event file.
 	/// @param thread - background thread where all socket events will be processed.
 	TrikEventFile(const QString &fileName, QThread &thread);
-
-	~TrikEventFile() override;
+	~TrikEventFile() override {}
 
 	bool open() override;
 	bool close() override;
